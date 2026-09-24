@@ -1,0 +1,12 @@
+PDF Normalizer
+Copyright (C) 2026 PDF Normalizer contributors
+
+This application is licensed under GNU AGPL version 3 or later.
+PyMuPDF and MuPDF are copyright Artifex Software, Inc. and contributors,
+and are used under their open-source AGPL licenses. No commercial license
+is implied. Upstream source: https://github.com/pymupdf/PyMuPDF and
+https://github.com/ArtifexSoftware/mupdf .
+
+Other dependencies retain their own licenses. Exact releases are listed in
+requirements.lock; their distributions include license and attribution files.
+The website offers the corresponding application source at /source.zip.

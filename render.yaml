@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: pdf-normalizer
+    runtime: docker
+    plan: 4c-8g
+    region: oregon
+    numInstances: 1
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /healthz
+    autoDeployTrigger: "off"
+    disk:
+      name: pdf-jobs
+      mountPath: /var/data
+      sizeGB: 100
+    envVars:
+      - key: DATA_DIR
+        value: /var/data
+      - key: JOB_WORKERS
+        value: "2"
+      - key: WORKER_MEMORY_MB
+        value: "3072"
+      - key: MAX_UPLOAD_GB
+        value: "20"
+      - key: RETENTION_HOURS
+        value: "24"
+      - key: MAX_ACTIVE_JOBS
+        value: "20"
