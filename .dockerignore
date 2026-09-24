@@ -12,7 +12,7 @@
 !tests/*.py
 !Dockerfile
 !compose.yaml
-!render.yaml
+!render.large-example.yaml
 !README.md
 !LICENSE
 !NOTICE

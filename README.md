@@ -23,11 +23,13 @@ docker compose up --build -d
 docker compose exec --user 10001 normalizer python -m unittest discover -s tests -v
 ```
 
-Open http://127.0.0.1:8767 . The pinned Linux/amd64 image, Python dependencies, entrypoint, mounted data directory, two workers, 8 GB memory, and 4 CPU allocation match the proposed Render configuration. On an ARM Mac, Linux/amd64 runs under emulation; throughput does not predict Render performance. Docker Desktop must have enough memory allocated.
+Open http://127.0.0.1:8767 . The pinned Linux/amd64 image, Python dependencies, entrypoint, mounted data directory, two workers, 8 GB memory, and 4 CPU allocation match the larger Render example configuration. On an ARM Mac, Linux/amd64 runs under emulation; throughput does not predict Render performance. Docker Desktop must have enough memory allocated.
 
-## Deploy on Render
+## Deployment budget and Render example
 
-Create a Blueprint from this repository and review `render.yaml` before confirming paid provisioning. Proposed resources are **4 CPUs, 8 GB RAM, and a 100 GB persistent disk** in Oregon. At Render's September 2026 listed prices, base infrastructure is **$200/month** ($175 compute + $25 disk), excluding bandwidth, workspace fees, taxes, and other usage charges. No service is created by checking out this code.
+The current approved budget is **no more than $10/month**. No paid service has been provisioned. There is intentionally no default `render.yaml`: the larger-server example below exceeds that budget and must not be deployed without a new explicit spending approval.
+
+`render.large-example.yaml` preserves the previously tested larger-server configuration for reference only. Proposed resources are **4 CPUs, 8 GB RAM, and a 100 GB persistent disk** in Oregon. At Render's September 2026 listed prices, base infrastructure is **$200/month** ($175 compute + $25 disk), excluding bandwidth, workspace fees, taxes, and other usage charges. No service is created by checking out this code.
 
 Use one service instance and one Uvicorn process: SQLite and the job files share the persistent disk. The API runs as UID/GID 10001; only disk initialization runs as root. The startup script creates/chowns the mount root, drops privileges, and starts Uvicorn. Keep access logs disabled so private download tokens are not logged by the application. Hosting infrastructure may still log URLs; treat a download link as a secret. The service needs no external API keys.
 

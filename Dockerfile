@@ -9,7 +9,7 @@ COPY normalizer normalizer
 COPY static static
 COPY scripts scripts
 COPY tests tests
-COPY Dockerfile compose.yaml render.yaml README.md LICENSE NOTICE requirements.txt requirements-dev.txt .dockerignore .gitignore ./
+COPY Dockerfile compose.yaml render.large-example.yaml README.md LICENSE NOTICE requirements.txt requirements-dev.txt .dockerignore .gitignore ./
 RUN python scripts/package_source.py && mkdir -p /var/data && chown 10001:10001 /var/data
 EXPOSE 10000
 CMD ["python", "scripts/start.py"]

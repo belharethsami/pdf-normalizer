@@ -3,7 +3,7 @@ from pathlib import Path
 import zipfile
 
 root = Path(__file__).resolve().parent.parent
-files = ['Dockerfile', 'compose.yaml', 'render.yaml', 'README.md', 'LICENSE', 'NOTICE',
+files = ['Dockerfile', 'compose.yaml', 'render.large-example.yaml', 'README.md', 'LICENSE', 'NOTICE',
          'requirements.txt', 'requirements-dev.txt', 'requirements.lock', '.dockerignore', '.gitignore']
 for directory in ('normalizer', 'static', 'scripts', 'tests'):
     files.extend(str(p.relative_to(root)) for p in (root/directory).rglob('*')
