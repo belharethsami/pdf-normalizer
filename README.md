@@ -1,6 +1,6 @@
 # PDF Normalizer
 
-A public PDF upload service for Render. Every visible page is rendered at **150 dpi**, doubled with nearest-neighbor resampling, and saved as one **lossless RGB JPEG2000 image** (fixed 1024×1024 encoding tiles bound working memory) in a fresh PDF. This common base prevents mixed 150/300 dpi source sheets from retaining different 2× pixel-alignment signatures.
+A PDF upload service that runs locally in Docker and can be deployed to an approved server. Every visible page is rendered at **150 dpi**, doubled with nearest-neighbor resampling, and saved as one **lossless RGB JPEG2000 image** (fixed 1024×1024 encoding tiles bound working memory) in a fresh PDF. This common base prevents mixed 150/300 dpi source sheets from retaining different 2× pixel-alignment signatures.
 
 Visible text stays visible. Selectable text, original objects, metadata, attachments, interactive forms, links, and vector overlays are not copied. Whiteouts are baked into the pixels. Effective detail is 150 dpi; writing 300 dpi images does not restore detail. This is normalization, not a guarantee that every possible forensic difference in the source is eliminated. The output may be substantially larger.
 
@@ -23,7 +23,11 @@ docker compose up --build -d
 docker compose exec --user 10001 normalizer python -m unittest discover -s tests -v
 ```
 
-Open http://127.0.0.1:8767 . The pinned Linux/amd64 image, Python dependencies, entrypoint, mounted data directory, two workers, 8 GB memory, and 4 CPU allocation match the larger Render example configuration. On an ARM Mac, Linux/amd64 runs under emulation; throughput does not predict Render performance. Docker Desktop must have enough memory allocated.
+Open http://127.0.0.1:8767 . This address is available only on the host computer. Leave the computer awake and Docker running during processing. Jobs and downloads are saved in the `pdf-jobs` Docker volume across application restarts. The container restarts when Docker starts, unless explicitly stopped.
+
+To stop this app without deleting its saved files, run `docker compose stop`. To start it again, run `docker compose up -d`.
+
+The pinned Linux/amd64 image, Python dependencies, entrypoint, mounted data directory, two workers, 8 GB memory, and 4 CPU allocation match the larger Render example configuration. On an ARM Mac, Linux/amd64 runs under emulation; throughput does not predict Render performance. Docker Desktop must have enough memory allocated.
 
 ## Deployment budget and Render example
 
