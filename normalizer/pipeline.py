@@ -25,10 +25,25 @@ class Profile:
     base_dpi: int = 150
     scale: int = 2
     max_output_pixels: int = 100_000_000
+    endpoint_snap: int = 8
 
     def __post_init__(self):
         if not 36 <= self.base_dpi <= 300 or self.scale not in (1, 2):
             raise ValueError('Unsupported raster profile.')
+        if not isinstance(self.endpoint_snap, int) or not 0 <= self.endpoint_snap <= 8:
+            raise ValueError('Endpoint snapping must be between 0 and 8.')
+
+
+def snap_endpoints(image: Image.Image, threshold: int) -> Image.Image:
+    """Standardize near-black/white tones without spatial filtering.
+
+    A channel changes by at most `threshold` out of 255. Midtones, pixel
+    positions, and channel threshold masks between the endpoints stay intact.
+    The same lookup applies to every pixel on every page.
+    """
+    lut = [0 if value <= threshold else 255 if value >= 255-threshold else value
+           for value in range(256)]
+    return image.point(lut * len(image.getbands()))
 
 
 def pixel_statistics(image: Image.Image) -> dict:
@@ -120,6 +135,7 @@ def normalize(source: Path, destination: Path, *, profile: Profile = Profile(),
         raise ValueError('PDF must contain 1–10,000 pages.')
     report = {'profile': {'base_dpi': profile.base_dpi, 'output_dpi': profile.base_dpi*profile.scale,
                           'scale': profile.scale, 'resampling': 'nearest', 'encoding': 'lossless JPEG2000',
+                          'endpoint_snap': profile.endpoint_snap,
                           'tile_size': [1024, 1024], 'image_name': 'Im0', 'colorspace': 'DeviceRGB', 'bits_per_component': 8},
               'page_count': len(doc), 'pages': []}
     writer = ImagePDFWriter(destination, len(doc))
@@ -139,6 +155,9 @@ def normalize(source: Path, destination: Path, *, profile: Profile = Profile(),
                 pix = page.get_pixmap(dpi=profile.base_dpi, colorspace=pymupdf.csRGB, alpha=False, annots=True)
                 base = Image.frombytes('RGB', (pix.width, pix.height), pix.samples)
                 del pix
+                cleaned = snap_endpoints(base, profile.endpoint_snap)
+                base.close()
+                base = cleaned
                 image = base.resize((base.width*profile.scale, base.height*profile.scale), Image.Resampling.NEAREST)
                 base.close()
                 pixels_hash = hashlib.sha256(image.tobytes()).hexdigest()

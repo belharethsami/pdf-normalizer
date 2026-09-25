@@ -1,6 +1,8 @@
 # PDF Normalizer
 
-A PDF upload service that runs locally in Docker and can be deployed to an approved server. Every visible page is rendered at **150 dpi**, doubled with nearest-neighbor resampling, and saved as one **lossless RGB JPEG2000 image** (fixed 1024×1024 encoding tiles bound working memory) in a fresh PDF. This common base prevents mixed 150/300 dpi source sheets from retaining different 2× pixel-alignment signatures.
+A PDF upload service that runs locally in Docker and can be deployed to an approved server. Every visible page is rendered at **150 dpi**, has near-black/white tones standardized, is doubled with nearest-neighbor resampling, and is saved as one **lossless RGB JPEG2000 image** (fixed 1024×1024 encoding tiles bound working memory) in a fresh PDF. This common base prevents mixed 150/300 dpi source sheets from retaining different 2× pixel-alignment signatures.
+
+The same tone lookup runs on every page: RGB channel values 0–8 become 0, and 247–255 become 255. Other values are unchanged. This removes tiny endpoint variations that can differ between source encoders, without blurring, moving pixels, or changing midtones. Each channel changes by at most 8/255; very faint highlights or shadows within that range are clipped. The JPEG2000 encoding is lossless **after** this deliberate pixel cleanup. A low-level Python caller can set `Profile(endpoint_snap=0)` to disable it.
 
 Visible text stays visible. Selectable text, original objects, metadata, attachments, interactive forms, links, and vector overlays are not copied. Whiteouts are baked into the pixels. Effective detail is 150 dpi; writing 300 dpi images does not restore detail. This is normalization, not a guarantee that every possible forensic difference in the source is eliminated. The output may be substantially larger.
 

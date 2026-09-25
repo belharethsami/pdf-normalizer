@@ -21,6 +21,8 @@ def main():
         p.insert_text((24, 60), 'PUBLIC SYNTHETIC TEST', fontsize=15)
         p.insert_text((24, 120), 'COVERED CONTENT', fontsize=15)
         p.draw_rect((20, 95, 250, 130), color=None, fill=(1, 1, 1))
+        p.draw_rect((200, 20, 220, 40), color=None, fill=(251/255,)*3)
+        p.draw_rect((240, 20, 260, 40), color=None, fill=(4/255,)*3)
         if args.large_page:
             for i in range(60):
                 y = 160+i*22
@@ -63,6 +65,9 @@ def main():
                 pixels=np.frombuffer(pix.samples,dtype=np.uint8).reshape(pix.height,pix.width,3)
                 assert np.all(pixels[::2,::2]==pixels[1::2,1::2])
                 assert np.all(pixels[510:530,110:800]==255)
+                # Prove the running worker includes the common tone cleanup.
+                assert np.all(pixels[110:140,850:900]==255)
+                assert np.all(pixels[110:140,1010:1070]==0)
             print(json.dumps({'verified':True,'output_bytes':len(response.content),'seconds':round(time.monotonic()-started,2),'sha256':hashlib.sha256(response.content).hexdigest()}),flush=True)
         finally:
             client.post(path+'/cancel',headers=auth).raise_for_status()
